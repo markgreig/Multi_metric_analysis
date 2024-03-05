@@ -20,7 +20,7 @@ spokespeople_freq = defaultdict(int)
 # Iterate over each line
 for line in lines:
     # Find all matches of the pattern that represents a spokesperson's name and details
-    spokespeople_data = re.findall(r'[^,|]*\([^)]*\)(?:[^,|]*)', line)
+    spokespeople_data = re.findall(r'.*?\(.*?\)(?:.*?(?=\||,|$))', line)
 
     # Check if the line has a frequency
     if len(spokespeople_data) > 0 and ' ' in line.split()[-1]:
