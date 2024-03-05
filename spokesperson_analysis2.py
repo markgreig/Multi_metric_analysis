@@ -27,12 +27,8 @@ def process_clipboard_data(clipboard_data):
             spokesperson = match.group(1)
             frequency = int(match.group(2))
 
-            # Clean and split spokespersons by '|'
-            spokespeople = [name.strip() for name in spokesperson.split('|')]
-
             # Append each cleaned entry to the list
-            for person in spokespeople:
-                cleaned_data.append([person, frequency])
+            cleaned_data.append([spokesperson, frequency])
 
     # Create a DataFrame from the cleaned data
     df = pd.DataFrame(cleaned_data, columns=['Spokesperson', 'Frequency'])
@@ -46,11 +42,8 @@ text = st.text_input("Paste text here")
 if text:
     df = process_clipboard_data(text)
 
-    # Group by Spokesperson and calculate the sum of Frequency
-    result = df.groupby('Spokesperson')['Frequency'].sum().reset_index()
-
     # Sort by Frequency in descending order
-    result = result.sort_values(by='Frequency', ascending=False)
+    result = df.sort_values(by='Frequency', ascending=False)
 
     st.write(result)
 
