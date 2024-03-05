@@ -4,61 +4,39 @@
 # In[ ]:
 
 
-import re
 import streamlit as st
-import pandas as pd
+from collections import defaultdict
 
-st.title('My App')
+st.title('Spokesperson Frequency Counter')
 
-# Function to clean and process the clipboard data
-def process_clipboard_data(clipboard_data):
-    # Split the clipboard data into lines
-    lines = clipboard_data.strip().split('\n')
+input_text = st.text_area("Enter spokespeople data", """
+Ryan Truswel (Craft Beer Buyer, Asda), Michael Gleeson (CFO, Asda) 1
+Unnamed Spokesperson, Carol (Customer trading manage, Asda) 3
+""")
 
-    # Initialize a list to store cleaned and split data
-    cleaned_data = []
+# Split the input by lines
+lines = input_text.split('\n')
 
-    # Regular expression pattern to match spokesperson and frequency
-    pattern = r'(.+?)\s+(\d+)'
+# Create a dictionary to hold the spokespeople and their frequencies
+spokespeople_freq = defaultdict(int)
 
-    for line in lines:
-        match = re.match(pattern, line)
-        if match:
-            spokesperson = match.group(1)
-            frequency = int(match.group(2))
+# Iterate over each line
+for line in lines:
+    # Split the line by ', ' to separate the spokespeople
+    spokespeople_data = line.split(', ')
 
-            # Append each cleaned entry to the list
-            cleaned_data.append([spokesperson, frequency])
+    # Get the frequency for this line
+    freq = int(spokespeople_data[-1])
 
-    # Create a DataFrame from the cleaned data
-    df = pd.DataFrame(cleaned_data, columns=['Spokesperson', 'Frequency'])
+    # Remove the frequency from the list
+    spokespeople_data = spokespeople_data[:-1]
 
-    return df
+    # Iterate over each spokesperson
+    for spokesperson in spokespeople_data:
+        # Add the frequency to the dictionary
+        spokespeople_freq[spokesperson] += freq
 
-# Get the text from the clipboard
-text = st.text_input("Paste text here")
-
-# Process clipboard data
-if text:
-    df = process_clipboard_data(text)
-
-    # Sort by Frequency in descending order
-    result = df.sort_values(by='Frequency', ascending=False)
-
-    st.write(result)
-
-    # Provide a download link for the data as CSV
-    @st.cache
-    def convert_df(result):
-        return result.to_csv(index=False).encode('utf-8')
-
-    csv = convert_df(result)
-
-    st.download_button(
-         label="Download data as CSV",
-         data=csv,
-         file_name='top_spokespeople.csv',
-         mime='text/csv',
-     )
+# Display the spokespeople and their frequencies in a table
+st.table(list(spokespeople_freq.items()))
 
 # In[ ]:
