@@ -3,7 +3,6 @@
 
 # In[ ]:
 
-
 import streamlit as st
 import re
 from collections import defaultdict
@@ -20,26 +19,31 @@ spokespeople_freq = defaultdict(int)
 
 # Iterate over each line
 for line in lines:
-    # Split the line by ', ' or '|' only if they're at the beginning of the string or preceded by a closing parenthesis
-    spokespeople_data = re.split(r'([,|])\s*(?<!\w+\))', line)
+    # Split the line by ', ' or '|'
+    parts = re.split(r'[,|]\s*', line)
+
+    # Merge any parts that end with '(' with the next part
+    i = 0
+    while i < len(parts) - 1:
+        if parts[i].endswith('('):
+            parts[i] += parts[i+1]
+            del parts[i+1]
+        else:
+            i += 1
 
     # Check if the line has a frequency
-    if len(spokespeople_data) > 0 and ' ' in spokespeople_data[-1]:
+    if len(parts) > 0 and ' ' in parts[-1]:
         # Get the frequency for this line
-        freq = int(spokespeople_data[-1].split()[-1])
+        freq = int(parts[-1].split()[-1])
 
         # Remove the frequency from the list
-        spokespeople_data = spokespeople_data[:-1]
+        parts = parts[:-1]
 
         # Iterate over each spokesperson
-        for spokesperson in spokespeople_data:
-            # Remove any leading commas or pipes
-            spokesperson = spokesperson.lstrip(',|')
-
+        for spokesperson in parts:
             # Add the frequency to the dictionary
             spokespeople_freq[spokesperson] += freq
 
 # Display the spokespeople and their frequencies in a table
 st.table(list(spokespeople_freq.items()))
-
 # In[ ]:
