@@ -19,31 +19,20 @@ spokespeople_freq = defaultdict(int)
 
 # Iterate over each line
 for line in lines:
-    # Split the line by ', ' or '|'
-    parts = re.split(r'[,|]\s*', line)
-
-    # Merge any parts that end with '(' with the next part
-    i = 0
-    while i < len(parts) - 1:
-        if parts[i].endswith('('):
-            parts[i] += parts[i+1]
-            del parts[i+1]
-        else:
-            i += 1
+    # Find all matches of the pattern that represents a spokesperson's name and details
+    spokespeople_data = re.findall(r'\w+\s*\(.*?\)', line)
 
     # Check if the line has a frequency
-    if len(parts) > 0 and ' ' in parts[-1]:
+    if len(spokespeople_data) > 0 and ' ' in line.split()[-1]:
         # Get the frequency for this line
-        freq = int(parts[-1].split()[-1])
-
-        # Remove the frequency from the list
-        parts = parts[:-1]
+        freq = int(line.split()[-1])
 
         # Iterate over each spokesperson
-        for spokesperson in parts:
+        for spokesperson in spokespeople_data:
             # Add the frequency to the dictionary
             spokespeople_freq[spokesperson] += freq
 
 # Display the spokespeople and their frequencies in a table
 st.table(list(spokespeople_freq.items()))
+
 # In[ ]:
