@@ -5,6 +5,7 @@
 
 
 import streamlit as st
+import re
 from collections import defaultdict
 
 st.title('Spokesperson Frequency Counter')
@@ -19,8 +20,8 @@ spokespeople_freq = defaultdict(int)
 
 # Iterate over each line
 for line in lines:
-    # Split the line by ', ' to separate the spokespeople
-    spokespeople_data = line.split(', ')
+    # Split the line by ', ' or '|' only if they're not inside parentheses
+    spokespeople_data = re.split(r'[,|]\s*(?!\w+\))', line)
 
     # Check if the line has a frequency
     if len(spokespeople_data) > 0 and ' ' in spokespeople_data[-1]:
