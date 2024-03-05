@@ -19,7 +19,7 @@ def process_clipboard_data(clipboard_data):
     cleaned_data = []
 
     # Regular expression pattern to match spokesperson and frequency
-    pattern = r'(.+?),\s*(\d+)'
+    pattern = r'(.+?)\s+(\d+)'
 
     for line in lines:
         match = re.match(pattern, line)
@@ -27,11 +27,8 @@ def process_clipboard_data(clipboard_data):
             spokesperson = match.group(1)
             frequency = int(match.group(2))
 
-            # Clean the spokesperson name
-            cleaned_spokesperson = spokesperson.strip()
-
             # Append each cleaned entry to the list
-            cleaned_data.append([cleaned_spokesperson, frequency])
+            cleaned_data.append([spokesperson, frequency])
 
     # Create a DataFrame from the cleaned data
     df = pd.DataFrame(cleaned_data, columns=['Spokesperson', 'Frequency'])
@@ -45,11 +42,8 @@ text = st.text_input("Paste text here")
 if text:
     df = process_clipboard_data(text)
 
-    # Group by Spokesperson and calculate the sum of Frequency
-    result = df.groupby('Spokesperson')['Frequency'].sum().reset_index()
-
     # Sort by Frequency in descending order
-    result = result.sort_values(by='Frequency', ascending=False)
+    result = df.sort_values(by='Frequency', ascending=False)
 
     st.write(result)
 
