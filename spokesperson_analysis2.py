@@ -26,7 +26,7 @@ for line in lines:
     spokespeople_data = line.split(', ')
 
     # Get the frequency for this line
-    freq = int(spokespeople_data[-1])
+    freq = int(spokespeople_data[-1].split()[-1])
 
     # Remove the frequency from the list
     spokespeople_data = spokespeople_data[:-1]
