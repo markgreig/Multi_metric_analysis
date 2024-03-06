@@ -15,48 +15,48 @@ def process_data(data):
     processed_data = []
     
     # Create a dictionary to store the spokesperson names and their corresponding job titles
-    spokesperson_dict = {}
+    metric_dict = {}
     
     # Process each row
     for row in rows:
         # Split the row into spokespeople
-        spokespeople = row.split('|')
+        metrics = row.split('|')
         
         # Process each spokesperson
-        for spokesperson in spokespeople:
+        for metric in metrics:
             # Split the spokesperson into name and frequency
-            parts = spokesperson.strip().split()
+            parts = metric.strip().split()
             if len(parts) > 1 and parts[-1].isdigit():
                 name = ' '.join(parts[:-1])
-                frequency = int(parts[-1])
+                volume = int(parts[-1])
             else:
                 name = ' '.join(parts)
-                frequency = 1
+                volume = 1
             
             # Add the spokesperson and frequency to the processed data if the name is not blank
             if name.strip():
-                processed_data.append((name, frequency))
+                processed_data.append((name, volume))
                 
                 # Check if the spokesperson name already exists in the dictionary
                 first_two_words = ' '.join(name.split()[:2])
-                if first_two_words in spokesperson_dict:
+                if first_two_words in metric_dict:
                     # Check if the job title matches the existing job title
-                    existing_job_title = spokesperson_dict[first_two_words]
+                    existing_job_title = metric_dict[first_two_words]
                     current_job_title = ' '.join(name.split()[2:])
                     if current_job_title != existing_job_title:
-                        processed_data.append((f"Warning: Potential duplicate for '{first_two_words}' with different job titles", 0))
+                        processed_data.append((f"Warning: Potential duplicate for '{first_two_words}'", 0))
                 else:
                     # Add the spokesperson name and job title to the dictionary
-                    spokesperson_dict[first_two_words] = ' '.join(name.split()[2:])
+                    metric_dict[first_two_words] = ' '.join(name.split()[2:])
     
     # Create a DataFrame from the processed data
-    df = pd.DataFrame(processed_data, columns=['Spokesperson', 'Frequency'])
+    df = pd.DataFrame(processed_data, columns=['Metric', 'Volume'])
     
     # Group the DataFrame by spokesperson and sum the frequencies
-    df = df.groupby('Spokesperson').sum().reset_index()
+    df = df.groupby('Metric').sum().reset_index()
     
     # Sort the DataFrame by frequency in descending order
-    df = df.sort_values('Frequency', ascending=False)
+    df = df.sort_values('Volume', ascending=False)
     
     return df
 
