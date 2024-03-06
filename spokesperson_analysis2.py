@@ -5,6 +5,7 @@
 
 import streamlit as st
 import pandas as pd
+import io
 
 def process_data(data):
     # Split the data into rows
@@ -53,7 +54,7 @@ def main():
         # Convert the DataFrame to CSV
         csv = df.to_csv(index=False)
         
-        # Provide a download button for the CSV file
+        # Create a download button for the CSV file
         st.download_button(
             label='Download CSV',
             data=csv,
