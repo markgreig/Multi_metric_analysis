@@ -21,28 +21,37 @@ def process_data(data):
         
         # Process each spokesperson
         for spokesperson in spokespeople:
-            # Split the spokesperson into name and frequency
+            # Split the spokesperson into name, frequency, and reach
             parts = spokesperson.strip().split()
-            if len(parts) > 1 and parts[-1].isdigit():
+            if len(parts) > 2 and parts[-1].isdigit() and parts[-2].isdigit():
+                name = ' '.join(parts[:-2])
+                frequency = int(parts[-2])
+                reach = int(parts[-1])
+            elif len(parts) > 1 and parts[-1].isdigit():
                 name = ' '.join(parts[:-1])
                 frequency = int(parts[-1])
+                reach = 0
             else:
                 name = ' '.join(parts)
                 frequency = 1
+                reach = 0
             
-            # Add the spokesperson and frequency to the processed data
-            processed_data.append((name, frequency))
+            # Add the spokesperson, frequency, and reach to the processed data
+            processed_data.append((name, frequency, reach))
     
     # Create a DataFrame from the processed data
-    df = pd.DataFrame(processed_data, columns=['Spokesperson', 'Frequency'])
+    df = pd.DataFrame(processed_data, columns=['Spokesperson', 'Frequency', 'Reach'])
     
-    # Group the DataFrame by spokesperson and sum the frequencies
-    df = df.groupby('Spokesperson').sum().reset_index()
+    # Group the DataFrame by spokesperson and sum the frequencies and reaches
+    df = df.groupby('Spokesperson').agg({'Frequency': 'sum', 'Reach': 'sum'}).reset_index()
+    
+    # Sort the DataFrame by frequency in descending order and then by reach in descending order
+    df = df.sort_values(['Frequency', 'Reach'], ascending=[False, False])
     
     return df
 
 def main():
-    st.title('Spokesperson Frequency App')
+    st.title('Spokesperson Frequency and Reach App')
     
     # Get the input data from the user
     data = st.text_area('Enter the data:', height=200)
@@ -62,7 +71,7 @@ def main():
         st.download_button(
             label='Download CSV',
             data=csv,
-            file_name='spokesperson_frequency.csv',
+            file_name='spokesperson_frequency_reach.csv',
             mime='text/csv'
         )
 
