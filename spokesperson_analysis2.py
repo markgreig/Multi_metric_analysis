@@ -21,28 +21,41 @@ def preprocess_data(data):
         
         # Process each spokesperson
         for spokesperson in spokespeople:
-            # Split the spokesperson into name and job title
+            # Split the spokesperson into name, job title, and frequency
             parts = spokesperson.strip().split(' - ')
             if len(parts) > 1:
-                name = parts[0].strip()
+                name_and_frequency = parts[0].strip().split()
+                if len(name_and_frequency) > 1 and name_and_frequency[-1].isdigit():
+                    name = ' '.join(name_and_frequency[:-1])
+                    frequency = int(name_and_frequency[-1])
+                else:
+                    name = ' '.join(name_and_frequency)
+                    frequency = 1
                 job_title = parts[1].strip()
             else:
-                name = parts[0].strip()
+                name_and_frequency = parts[0].strip().split()
+                if len(name_and_frequency) > 1 and name_and_frequency[-1].isdigit():
+                    name = ' '.join(name_and_frequency[:-1])
+                    frequency = int(name_and_frequency[-1])
+                else:
+                    name = ' '.join(name_and_frequency)
+                    frequency = 1
                 job_title = ''
             
             # Check if the spokesperson already exists in the preprocessed data
             if name in preprocessed_data:
-                # If the spokesperson exists and the stored job title is empty, update it with the current job title
-                if not preprocessed_data[name]:
-                    preprocessed_data[name] = job_title
+                # If the spokesperson exists, update the frequency and job title (if empty)
+                preprocessed_data[name]['frequency'] += frequency
+                if not preprocessed_data[name]['job_title']:
+                    preprocessed_data[name]['job_title'] = job_title
             else:
                 # If the spokesperson doesn't exist, add them to the preprocessed data
-                preprocessed_data[name] = job_title
+                preprocessed_data[name] = {'frequency': frequency, 'job_title': job_title}
     
     # Create a new data string with the preprocessed data
     preprocessed_data_string = ''
-    for name, job_title in preprocessed_data.items():
-        preprocessed_data_string += f"{name} - {job_title}\n"
+    for name, data in preprocessed_data.items():
+        preprocessed_data_string += f"{name} {data['frequency']} - {data['job_title']}\n"
     
     return preprocessed_data_string
 
@@ -55,29 +68,36 @@ def process_data(data):
     
     # Process each row
     for row in rows:
-        # Split the row into spokespeople
-        spokespeople = row.split('|')
-        
-        # Process each spokesperson
-        for spokesperson in spokespeople:
-            # Split the spokesperson into name and frequency
-            parts = spokesperson.strip().split()
-            if len(parts) > 1 and parts[-1].isdigit():
-                name = ' '.join(parts[:-1])
-                frequency = int(parts[-1])
+        # Split the row into spokesperson, frequency, and job title
+        parts = row.strip().split(' - ')
+        if len(parts) > 1:
+            name_and_frequency = parts[0].strip().split()
+            if len(name_and_frequency) > 1 and name_and_frequency[-1].isdigit():
+                name = ' '.join(name_and_frequency[:-1])
+                frequency = int(name_and_frequency[-1])
             else:
-                name = ' '.join(parts)
+                name = ' '.join(name_and_frequency)
                 frequency = 1
+            job_title = parts[1].strip()
+        else:
+            name_and_frequency = parts[0].strip().split()
+            if len(name_and_frequency) > 1 and name_and_frequency[-1].isdigit():
+                name = ' '.join(name_and_frequency[:-1])
+                frequency = int(name_and_frequency[-1])
+            else:
+                name = ' '.join(name_and_frequency)
+                frequency = 1
+            job_title = ''
+        
+        # Add the spokesperson, frequency, and job title to the processed data if the name is not blank
+        if name.strip():
+            processed_data.append((name, frequency, job_title))
             
-            # Add the spokesperson and frequency to the processed data if the name is not blank
-            if name.strip():
-                processed_data.append((name, frequency))
-    
-    # Create a DataFrame from the processed data
-    df = pd.DataFrame(processed_data, columns=['Spokesperson', 'Frequency'])
+   # Create a DataFrame from the processed data
+    df = pd.DataFrame(processed_data, columns=['Spokesperson', 'Frequency', 'Job Title'])
     
     # Group the DataFrame by spokesperson and sum the frequencies
-    df = df.groupby('Spokesperson').sum().reset_index()
+    df = df.groupby(['Spokesperson', 'Job Title']).sum().reset_index()
     
     # Sort the DataFrame by frequency in descending order
     df = df.sort_values('Frequency', ascending=False)
@@ -113,6 +133,5 @@ def main():
         )
 
 if __name__ == '__main__':
-    main()
-    
+    main() 
 # In[ ]:
