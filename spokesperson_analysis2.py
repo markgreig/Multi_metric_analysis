@@ -19,22 +19,23 @@ def process_data(data):
         # Split the row into spokespeople
         spokespeople = row.split('|')
         
+        # Get the reach value from the last spokesperson in the row
+        last_spokesperson = spokespeople[-1].strip().split()
+        if len(last_spokesperson) > 1 and last_spokesperson[-1].isdigit():
+            reach = int(last_spokesperson[-1])
+        else:
+            reach = 0
+        
         # Process each spokesperson
         for spokesperson in spokespeople:
-            # Split the spokesperson into name, frequency, and reach
+            # Split the spokesperson into name and frequency
             parts = spokesperson.strip().split()
-            if len(parts) > 2 and parts[-1].isdigit() and parts[-2].isdigit():
-                name = ' '.join(parts[:-2])
-                frequency = int(parts[-2])
-                reach = int(parts[-1])
-            elif len(parts) > 1 and parts[-1].isdigit():
+            if len(parts) > 1 and parts[-1].isdigit():
                 name = ' '.join(parts[:-1])
                 frequency = int(parts[-1])
-                reach = 0
             else:
                 name = ' '.join(parts)
                 frequency = 1
-                reach = 0
             
             # Add the spokesperson, frequency, and reach to the processed data
             processed_data.append((name, frequency, reach))
