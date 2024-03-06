@@ -30,14 +30,18 @@ def process_data(data):
                 name = ' '.join(parts)
                 frequency = 1
             
-            # Add the spokesperson and frequency to the processed data
-            processed_data.append((name, frequency))
+            # Add the spokesperson and frequency to the processed data if the name is not blank
+            if name.strip():
+                processed_data.append((name, frequency))
     
     # Create a DataFrame from the processed data
     df = pd.DataFrame(processed_data, columns=['Spokesperson', 'Frequency'])
     
     # Group the DataFrame by spokesperson and sum the frequencies
     df = df.groupby('Spokesperson').sum().reset_index()
+    
+    # Sort the DataFrame by frequency in descending order
+    df = df.sort_values('Frequency', ascending=False)
     
     return df
 
@@ -68,4 +72,5 @@ def main():
 
 if __name__ == '__main__':
     main()
+    
 # In[ ]:
