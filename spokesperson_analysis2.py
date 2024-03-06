@@ -22,9 +22,13 @@ def process_data(data):
         # Process each spokesperson
         for spokesperson in spokespeople:
             # Split the spokesperson into name and frequency
-            parts = spokesperson.strip().rsplit(' ', 1)
-            name = parts[0].strip()
-            frequency = int(parts[1]) if len(parts) > 1 and parts[1].strip().isdigit() else 1
+            parts = spokesperson.strip().split()
+            if len(parts) > 1 and parts[-1].isdigit():
+                name = ' '.join(parts[:-1])
+                frequency = int(parts[-1])
+            else:
+                name = ' '.join(parts)
+                frequency = 1
             
             # Add the spokesperson and frequency to the processed data
             processed_data.append((name, frequency))
