@@ -14,8 +14,8 @@ def process_data(data):
     # Create a list to store the processed data
     processed_data = []
     
-    # Create a set to store the first two words of each spokesperson
-    first_two_words_set = set()
+    # Create a dictionary to store the spokesperson names and their corresponding job titles
+    spokesperson_dict = {}
     
     # Process each row
     for row in rows:
@@ -37,12 +37,17 @@ def process_data(data):
             if name.strip():
                 processed_data.append((name, frequency))
                 
-                # Check if the first two words of the spokesperson match any existing spokesperson
+                # Check if the spokesperson name already exists in the dictionary
                 first_two_words = ' '.join(name.split()[:2])
-                if first_two_words in first_two_words_set:
-                    processed_data.append((f"Warning: Potential duplicate for '{first_two_words}'", 0))
+                if first_two_words in spokesperson_dict:
+                    # Check if the job title matches the existing job title
+                    existing_job_title = spokesperson_dict[first_two_words]
+                    current_job_title = ' '.join(name.split()[2:])
+                    if current_job_title != existing_job_title:
+                        processed_data.append((f"Warning: Potential duplicate for '{first_two_words}' with different job titles", 0))
                 else:
-                    first_two_words_set.add(first_two_words)
+                    # Add the spokesperson name and job title to the dictionary
+                    spokesperson_dict[first_two_words] = ' '.join(name.split()[2:])
     
     # Create a DataFrame from the processed data
     df = pd.DataFrame(processed_data, columns=['Spokesperson', 'Frequency'])
