@@ -61,7 +61,7 @@ def process_data(data):
     return df
 
 def main():
-    st.title('Spokesperson Frequency App')
+    st.title('Metric Volume Discovery Tool')
     
     # Get the input data from the user
     data = st.text_area('Enter the data:', height=200)
@@ -81,7 +81,7 @@ def main():
         st.download_button(
             label='Download CSV',
             data=csv,
-            file_name='spokesperson_frequency.csv',
+            file_name='metric_volume.csv',
             mime='text/csv'
         )
 
