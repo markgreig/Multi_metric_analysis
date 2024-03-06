@@ -29,10 +29,10 @@ def process_data(data):
                 reach = int(parts[-1])
             elif len(parts) > 1 and parts[-1].isdigit():
                 name = ' '.join(parts[:-1])
-                frequency = int(parts[-1])
-                reach = 0
+                frequency = 1
+                reach = int(parts[-1])
             else:
-                name = ' '.join(parts)
+                name = spokesperson.strip()
                 frequency = 1
                 reach = 0
             
