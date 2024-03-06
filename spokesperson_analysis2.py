@@ -7,6 +7,45 @@ import streamlit as st
 import pandas as pd
 import io
 
+def preprocess_data(data):
+    # Split the data into rows
+    rows = data.split('\n')
+    
+    # Create a dictionary to store the preprocessed data
+    preprocessed_data = {}
+    
+    # Process each row
+    for row in rows:
+        # Split the row into spokespeople
+        spokespeople = row.split('|')
+        
+        # Process each spokesperson
+        for spokesperson in spokespeople:
+            # Split the spokesperson into name and job title
+            parts = spokesperson.strip().split(' - ')
+            if len(parts) > 1:
+                name = parts[0].strip()
+                job_title = parts[1].strip()
+            else:
+                name = parts[0].strip()
+                job_title = ''
+            
+            # Check if the spokesperson already exists in the preprocessed data
+            if name in preprocessed_data:
+                # If the spokesperson exists and the stored job title is empty, update it with the current job title
+                if not preprocessed_data[name]:
+                    preprocessed_data[name] = job_title
+            else:
+                # If the spokesperson doesn't exist, add them to the preprocessed data
+                preprocessed_data[name] = job_title
+    
+    # Create a new data string with the preprocessed data
+    preprocessed_data_string = ''
+    for name, job_title in preprocessed_data.items():
+        preprocessed_data_string += f"{name} - {job_title}\n"
+    
+    return preprocessed_data_string
+
 def process_data(data):
     # Split the data into rows
     rows = data.split('\n')
@@ -52,8 +91,11 @@ def main():
     data = st.text_area('Enter the data:', height=200)
     
     if st.button('Process Data'):
-        # Process the data
-        df = process_data(data)
+        # Preprocess the data
+        preprocessed_data = preprocess_data(data)
+        
+        # Process the preprocessed data
+        df = process_data(preprocessed_data)
         
         # Display the preview of the CSV file
         st.subheader('Preview of CSV file:')
