@@ -4,38 +4,64 @@
 # In[ ]:
 
 import streamlit as st
-import re
-from collections import defaultdict
+import pandas as pd
 
-st.title('Spokesperson Frequency Counter')
+def process_data(data):
+    # Split the data into rows
+    rows = data.split('\n')
+    
+    # Create a list to store the processed data
+    processed_data = []
+    
+    # Process each row
+    for row in rows:
+        # Split the row into spokespeople
+        spokespeople = row.split('|')
+        
+        # Process each spokesperson
+        for spokesperson in spokespeople:
+            # Split the spokesperson into name and frequency
+            parts = spokesperson.rsplit(' ', 1)
+            name = parts[0].strip()
+            frequency = int(parts[1]) if len(parts) > 1 else 1
+            
+            # Add the spokesperson and frequency to the processed data
+            processed_data.append((name, frequency))
+    
+    # Create a DataFrame from the processed data
+    df = pd.DataFrame(processed_data, columns=['Spokesperson', 'Frequency'])
+    
+    # Group the DataFrame by spokesperson and sum the frequencies
+    df = df.groupby('Spokesperson').sum().reset_index()
+    
+    return df
 
-input_text = st.text_area("Enter spokespeople data")
+def main():
+    st.title('Spokesperson Frequency App')
+    
+    # Get the input data from the user
+    data = st.text_area('Enter the data:', height=200)
+    
+    if st.button('Process Data'):
+        # Process the data
+        df = process_data(data)
+        
+        # Display the preview of the CSV file
+        st.subheader('Preview of CSV file:')
+        st.write(df)
+        
+        # Convert the DataFrame to CSV
+        csv = df.to_csv(index=False)
+        
+        # Provide a download button for the CSV file
+        st.download_button(
+            label='Download CSV',
+            data=csv,
+            file_name='spokesperson_frequency.csv',
+            mime='text/csv'
+        )
 
-# Split the input by lines
-lines = input_text.split('\n')
-
-# Create a dictionary to hold the spokespeople and their frequencies
-spokespeople_freq = defaultdict(int)
-
-# Iterate over each line
-for line in lines:
-    # Find all matches of the pattern that represents a spokesperson's name and details
-    spokespeople_data = re.findall(r'[^,|]*\([^)]*\)(?:[^,|]*)', line)
-
-    # Check if the line has a frequency
-    if len(spokespeople_data) > 0 and ' ' in line.split()[-1]:
-        # Get the frequency for this line
-        freq = int(line.split()[-1])
-
-        # Iterate over each spokesperson
-        for spokesperson in spokespeople_data:
-            # Remove any leading separators
-            spokesperson = spokesperson.lstrip('|')
-
-            # Add the frequency to the dictionary
-            spokespeople_freq[spokesperson] += freq
-
-# Display the spokespeople and their frequencies in a table
-st.table(list(spokespeople_freq.items()))
+if __name__ == '__main__':
+    main()
 
 # In[ ]:
