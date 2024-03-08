@@ -50,10 +50,10 @@ def process_data(data):
                     metric_dict[first_two_words] = ' '.join(name.split()[2:])
     
     # Create a DataFrame from the processed data
-    df = pd.DataFrame(processed_data, columns=['Metric', 'Volume'])
+    df = pd.DataFrame(processed_data, columns=['Entity', 'Volume'])
     
     # Group the DataFrame by spokesperson and sum the frequencies
-    df = df.groupby('Metric').sum().reset_index()
+    df = df.groupby('Entity').sum().reset_index()
     
     # Sort the DataFrame by frequency in descending order
     df = df.sort_values('Volume', ascending=False)
