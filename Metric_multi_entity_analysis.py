@@ -61,7 +61,7 @@ def process_data(data):
     return df
 
 def main():
-    st.title('Metric Volume Discovery Tool')
+    st.title('Metric Entity Volume Analyser')
     
     # Get the input data from the user
     data = st.text_area('Enter the data:', height=200)
@@ -81,7 +81,7 @@ def main():
         st.download_button(
             label='Download CSV',
             data=csv,
-            file_name='metric_volume.csv',
+            file_name='metric_entity_volume.csv',
             mime='text/csv'
         )
 
