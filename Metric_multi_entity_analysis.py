@@ -29,7 +29,7 @@ def process_data(data):
         
         # Process each spokesperson
         for metric in metrics:
-            name = metric.strip().lower()  # Convert the name to lowercase
+            name = metric.strip()  # Convert the name to lowercase
             
             # Add the spokesperson and frequency to the processed data if the name is not blank
             if name:
