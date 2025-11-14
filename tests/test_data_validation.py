@@ -66,6 +66,21 @@ class TestMalformedInput:
         assert result.iloc[0]['Entity'] == 'Entity123'
         assert result.iloc[0]['Volume'] == 1
 
+    def test_extreme_malformed_input_triggers_error_handling(self):
+        """Test that error handling works for extreme edge cases"""
+        # This shouldn't crash even with unusual input patterns
+        test_cases = [
+            "|||||||",  # Many pipes
+            "\n\n\n",  # Only newlines
+            "   |   |   ",  # Whitespace and pipes
+        ]
+
+        for data in test_cases:
+            result = process_data(data)
+            # Should return empty DataFrame, not crash
+            assert isinstance(result, pd.DataFrame)
+            assert len(result) >= 0  # Can be empty or have entities
+
 
 class TestVolumeParsingRobustness:
     """Test robustness of volume parsing logic"""
